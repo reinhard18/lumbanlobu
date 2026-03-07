@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, Mail, Lock, Loader2, ShieldCheck } from 'lucide-react';
+import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -38,7 +38,7 @@ export default function LoginPage() {
             <div className="login-card">
                 <div className="login-header">
                     <div className="login-icon">
-                        <ShieldCheck size={32} />
+                        <img src="/images/Toba.svg" alt="Toba Logo" />
                     </div>
                     <h1 className="login-title">Masuk ke Admin</h1>
                     <p className="login-subtitle">

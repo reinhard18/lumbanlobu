@@ -39,7 +39,7 @@ export default function Header() {
             <div className="header-inner">
                 <Link href="/" className="header-logo">
                     <div className="header-logo-icon">
-                        <Home size={20} />
+                        <img src="/images/Toba.svg" alt="Toba Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <span>Desa Lumban Lobu</span>
                 </Link>
