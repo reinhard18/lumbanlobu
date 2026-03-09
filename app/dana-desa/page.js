@@ -38,24 +38,18 @@ export default function DanaDesaPage() {
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <main style={{ flex: 1 }}>
-                {/* Hero Section */}
-                <section
-                    style={{
-                        padding: '120px 24px 60px',
-                        background: 'linear-gradient(135deg, var(--color-primary) 0%, #1e40af 100%)',
-                        color: 'white',
-                        textAlign: 'center',
-                    }}
-                >
-                    <div className="container" style={{ maxWidth: 800 }}>
-                        <h1 style={{ fontSize: '3rem', marginBottom: '16px', fontWeight: 700 }}>
-                            Dana Desa
-                        </h1>
-                        <p style={{ fontSize: '1.2rem', opacity: 0.9, lineHeight: 1.6 }}>
-                            Informasi dan transparansi pengelolaan Dana Desa Lumban Lobu dari tahun ke tahun.
-                        </p>
-                    </div>
-                </section>
+        <div className="container" style={{ paddingTop: '120px', paddingBottom: '40px' }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px' }}>
+                        Dana Desa
+                    </h1>
+                    <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '32px' }}>
+                        Informasi dan transparansi pengelolaan Dana Desa Lumban Lobu dari tahun ke tahun.
+                    </p>
+                </div>
+            </div>
+        </div>
 
                 {/* Content Section */}
                 <section style={{ padding: '60px 24px', backgroundColor: 'var(--color-bg)' }}>
