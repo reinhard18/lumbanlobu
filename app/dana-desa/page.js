@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, FileText, Image as ImageIcon } from 'lucide-react';
+import { Loader2, FileText, Image as ImageIcon, X } from 'lucide-react';
 
 export default function DanaDesaPage() {
     const [danaDesa, setDanaDesa] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         const fetchDanaDesa = async () => {
@@ -25,10 +26,17 @@ export default function DanaDesaPage() {
         fetchDanaDesa();
     }, []);
 
+    // Close modal on Escape key
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') setSelectedImage(null);
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, []);
+
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
-
             <main style={{ flex: 1 }}>
                 {/* Hero Section */}
                 <section
@@ -70,10 +78,12 @@ export default function DanaDesaPage() {
                                         overflow: 'hidden',
                                         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
                                         transition: 'transform 0.2s',
-                                        border: '1px solid var(--color-border)'
+                                        border: '1px solid var(--color-border)',
+                                        cursor: 'pointer'
                                     }}
                                     onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
                                     onMouseOut={(e) => e.currentTarget.style.transform = 'none'}
+                                    onClick={() => setSelectedImage(item.image_url)}
                                     >
                                         <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: 'var(--color-bg-alt)', position: 'relative' }}>
                                             {item.image_url ? (
@@ -120,6 +130,61 @@ export default function DanaDesaPage() {
                     </div>
                 </section>
             </main>
+
+            {/* Lightbox Modal */}
+            {selectedImage && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '40px',
+                        backdropFilter: 'blur(8px)',
+                        cursor: 'zoom-out'
+                    }}
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <button 
+                        style={{
+                            position: 'absolute',
+                            top: '24px',
+                            right: '24px',
+                            background: 'rgba(255,255,255,0.1)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '48px',
+                            height: '48px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                    >
+                        <X size={24} />
+                    </button>
+                    <img 
+                        src={selectedImage} 
+                        alt="Dana Desa Full Size" 
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                            borderRadius: '8px',
+                            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                            cursor: 'default'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
         </div>
     );
 }

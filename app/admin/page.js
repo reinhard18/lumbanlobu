@@ -65,7 +65,7 @@ function SortableOfficialItem({ off, onDelete }) {
             style={style}
             className={`admin-news-item ${isDragging ? 'dragging' : ''}`}
         >
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1 }}>
+            <div className="admin-item-content">
                 <div
                     {...attributes}
                     {...listeners}
@@ -73,9 +73,9 @@ function SortableOfficialItem({ off, onDelete }) {
                 >
                     <GripVertical size={18} />
                 </div>
-                <div className="admin-news-item-thumb" style={{ width: 44, height: 44, borderRadius: '50%', overflow: 'hidden', background: 'var(--color-bg-alt)', flexShrink: 0 }}>
+                <div className="admin-item-thumb" style={{ borderRadius: '50%' }}>
                     {off.image_url ? (
-                        <img src={off.image_url} alt={off.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={off.image_url} alt={off.name} />
                     ) : (
                         <Users size={18} style={{ margin: 13, color: 'var(--color-text-muted)' }} />
                     )}
@@ -780,9 +780,9 @@ export default function AdminPage() {
                     <ClipboardList size={24} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle' }} />
                     Panel Admin
                 </h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-                    <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                        <Shield size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
+                <div className="admin-header-actions">
+                    <span className="admin-user-info">
+                        <Shield size={14} />
                         {user.name} ({user.role})
                     </span>
                     <button className="btn btn-outline-dark btn-sm" onClick={logout}>
@@ -1381,10 +1381,10 @@ export default function AdminPage() {
                         ) : (
                             <div className="admin-news-list">
                                 {pengaduan.map((item) => (
-                                    <div key={item.id} className="admin-news-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '16px', padding: '24px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-start' }}>
-                                            <div>
-                                                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                                    <div key={item.id} className="admin-news-item admin-pengaduan-item">
+                                        <div className="admin-pengaduan-header">
+                                            <div className="admin-pengaduan-meta">
+                                                <div className="admin-pengaduan-badges">
                                                     <span className="role-badge" style={{ background: '#f1f5f9', color: '#475569', fontSize: '10px' }}>
                                                         {item.kategori}
                                                     </span>
@@ -1403,7 +1403,7 @@ export default function AdminPage() {
                                                     {formatDate(item.created_at)} {item.lokasi && ` · ${item.lokasi}`}
                                                 </p>
                                             </div>
-                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                            <div className="admin-pengaduan-actions">
                                                 <select
                                                     value={item.status}
                                                     onChange={(e) => handleUpdatePengaduanStatus(item.id, e.target.value)}
@@ -1417,7 +1417,7 @@ export default function AdminPage() {
                                             </div>
                                         </div>
 
-                                        <p style={{ lineHeight: '1.6', color: 'var(--color-text-main)' }}>
+                                        <p className="admin-pengaduan-content">
                                             {item.deskripsi}
                                         </p>
 
@@ -1427,7 +1427,7 @@ export default function AdminPage() {
                                                     <img
                                                         src={item.foto_url}
                                                         alt="Lampiran Pengaduan"
-                                                        style={{ maxWidth: '200px', borderRadius: '8px', border: '1px solid var(--color-border)' }}
+                                                        className="admin-pengaduan-image"
                                                     />
                                                 </a>
                                             </div>
@@ -1536,10 +1536,10 @@ export default function AdminPage() {
                             <div className="admin-news-list">
                                 {danaDesa.map((item) => (
                                     <div key={item.id} className="admin-news-item">
-                                        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1 }}>
-                                            <div className="admin-news-item-thumb" style={{ width: 80, height: 60, borderRadius: '8px', overflow: 'hidden', background: 'var(--color-bg-alt)', flexShrink: 0 }}>
+                                        <div className="admin-item-content">
+                                            <div className="admin-item-thumb" style={{ width: 80, height: 60 }}>
                                                 {item.image_url ? (
-                                                    <img src={item.image_url} alt={`Dana Desa ${item.year}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <img src={item.image_url} alt={`Dana Desa ${item.year}`} />
                                                 ) : (
                                                     <ImageIcon size={24} style={{ margin: 18, color: 'var(--color-text-muted)' }} />
                                                 )}
