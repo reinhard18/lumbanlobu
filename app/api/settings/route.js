@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // GET /api/settings - Fetch all settings (public)
 export async function GET() {
@@ -44,6 +45,9 @@ export async function PUT(request) {
                 );
             }
         }
+
+        // Revalidate public pages
+        revalidatePath('/');
 
         // Return updated settings
         const result = await query('SELECT key, value FROM settings');

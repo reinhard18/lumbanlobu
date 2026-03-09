@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // PUT /api/officials/[id] - Update official (protected, admin only)
 export async function PUT(request, { params }) {
@@ -37,6 +38,9 @@ export async function PUT(request, { params }) {
             );
         }
 
+        // Revalidate public pages
+        revalidatePath('/');
+
         return NextResponse.json({ data: result.rows[0] });
     } catch (error) {
         console.error('PUT /api/officials/[id] error:', error);
@@ -68,6 +72,9 @@ export async function DELETE(request, { params }) {
                 { status: 404 }
             );
         }
+
+        // Revalidate public pages
+        revalidatePath('/');
 
         return NextResponse.json({ message: 'Perangkat desa berhasil dihapus' });
     } catch (error) {

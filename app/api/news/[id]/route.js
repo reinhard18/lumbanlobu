@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // GET /api/news/:id - Fetch single news
 export async function GET(request, { params }) {
@@ -55,6 +56,8 @@ export async function PUT(request, { params }) {
         }
 
         const newsId = parseInt(id);
+        const slug = checkRes.rows[0].slug;
+
         const updateRes = await query(
             `UPDATE news SET 
                 title = COALESCE($1, title),
@@ -75,6 +78,12 @@ export async function PUT(request, { params }) {
                 newsId
             ]
         );
+
+        // Revalidate public pages
+        revalidatePath('/');
+        revalidatePath('/berita');
+        revalidatePath(`/berita/${slug}`);
+        revalidatePath(`/berita/${id}`);
 
         return NextResponse.json({ data: updateRes.rows[0] });
     } catch (error) {
@@ -100,6 +109,9 @@ export async function DELETE(request, { params }) {
         const { id } = await params;
         const newsId = parseInt(id);
 
+        const checkRes = await query('SELECT slug FROM news WHERE id = $1', [newsId]);
+        const slug = checkRes.rows.length > 0 ? checkRes.rows[0].slug : null;
+
         const deleteRes = await query('DELETE FROM news WHERE id = $1 RETURNING id', [newsId]);
 
         if (deleteRes.rowCount === 0) {
@@ -108,6 +120,12 @@ export async function DELETE(request, { params }) {
                 { status: 404 }
             );
         }
+
+        // Revalidate public pages
+        revalidatePath('/');
+        revalidatePath('/berita');
+        if (slug) revalidatePath(`/berita/${slug}`);
+        revalidatePath(`/berita/${id}`);
 
         return NextResponse.json({ message: 'Berita berhasil dihapus' });
     } catch (error) {

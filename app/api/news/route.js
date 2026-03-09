@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // GET /api/news - Fetch all news
 export async function GET(request) {
@@ -77,6 +78,10 @@ export async function POST(request) {
                 author || 'Admin Desa'
             ]
         );
+
+        // Revalidate public pages
+        revalidatePath('/');
+        revalidatePath('/berita');
 
         return NextResponse.json({ data: result.rows[0] }, { status: 201 });
     } catch (error) {

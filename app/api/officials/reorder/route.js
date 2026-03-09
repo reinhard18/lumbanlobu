@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // PUT /api/officials/reorder - Bulk reorder officials (protected, admin only)
 export async function PUT(request) {
@@ -26,6 +27,9 @@ export async function PUT(request) {
         for (let i = 0; i < body.length; i++) {
             await query('UPDATE village_officials SET order_index = $1 WHERE id = $2', [i, body[i]]);
         }
+
+        // Revalidate public pages
+        revalidatePath('/');
 
         return NextResponse.json({ message: 'Urutan berhasil diperbarui' });
     } catch (error) {

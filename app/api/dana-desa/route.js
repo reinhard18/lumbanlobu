@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
 import { verifyToken } from '../../../lib/auth';
+import { revalidatePath } from 'next/cache';
 
 export async function GET() {
     try {
@@ -38,6 +39,9 @@ export async function POST(request) {
             'INSERT INTO dana_desa (year, image_url) VALUES ($1, $2) RETURNING *',
             [year, image_url]
         );
+
+        // Revalidate public page
+        revalidatePath('/dana-desa');
 
         return NextResponse.json(
             { message: 'Data dana desa berhasil ditambahkan', data: result.rows[0] },

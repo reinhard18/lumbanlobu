@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 // GET /api/officials - Fetch all officials
 export async function GET() {
@@ -48,6 +49,9 @@ export async function POST(request) {
             'INSERT INTO village_officials (name, role, image_url, order_index) VALUES ($1, $2, $3, $4) RETURNING *',
             [name, role, image_url || '', nextOrderIndex]
         );
+
+        // Revalidate public pages
+        revalidatePath('/');
 
         return NextResponse.json({ data: insertResult.rows[0] }, { status: 201 });
     } catch (error) {

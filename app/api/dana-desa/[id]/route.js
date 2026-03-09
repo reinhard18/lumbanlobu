@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { verifyToken } from '../../../../lib/auth';
+import { revalidatePath } from 'next/cache';
 
 export async function DELETE(request, { params }) {
     try {
@@ -20,6 +21,9 @@ export async function DELETE(request, { params }) {
         }
 
         await query('DELETE FROM dana_desa WHERE id = $1', [id]);
+
+        // Revalidate public page
+        revalidatePath('/dana-desa');
 
         return NextResponse.json(
             { message: 'Data dana desa berhasil dihapus' },
