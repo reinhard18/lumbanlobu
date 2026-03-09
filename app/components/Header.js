@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
-import { Home, Newspaper, Settings, Menu, X, LogIn, LogOut, MessageSquare } from 'lucide-react';
+import { Home, Newspaper, Settings, Menu, X, LogIn, LogOut, MessageSquare, FileText } from 'lucide-react';
 
 export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -27,6 +27,7 @@ export default function Header() {
     const navLinks = [
         { href: '/', label: 'Beranda', icon: <Home size={16} /> },
         { href: '/berita', label: 'Berita', icon: <Newspaper size={16} /> },
+        { href: '/dana-desa', label: 'Dana Desa', icon: <FileText size={16} /> },
         { href: '/pengaduan', label: 'Pengaduan', icon: <MessageSquare size={16} /> },
     ];
 

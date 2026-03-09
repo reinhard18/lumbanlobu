@@ -132,6 +132,17 @@ export default function AdminPage() {
     const [pengaduan, setPengaduan] = useState([]);
     const [loadingPengaduan, setLoadingPengaduan] = useState(false);
 
+    // Dana Desa state
+    const [danaDesa, setDanaDesa] = useState([]);
+    const [loadingDanaDesa, setLoadingDanaDesa] = useState(false);
+    const [danaDesaForm, setDanaDesaForm] = useState({
+        year: '',
+        image_url: '',
+    });
+    const [submittingDanaDesa, setSubmittingDanaDesa] = useState(false);
+    const [uploadingDanaDesaImage, setUploadingDanaDesaImage] = useState(false);
+
+
     // News form
     const [newsForm, setNewsForm] = useState({
         title: '',
@@ -253,6 +264,21 @@ export default function AdminPage() {
         }
     }, [token]);
 
+    const fetchDanaDesa = useCallback(async () => {
+        setLoadingDanaDesa(true);
+        try {
+            const res = await fetch('/api/dana-desa');
+            const json = await res.json();
+            if (res.ok) {
+                setDanaDesa(json.data || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch dana desa:', err);
+        } finally {
+            setLoadingDanaDesa(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (user) {
             fetchNews();
@@ -282,6 +308,12 @@ export default function AdminPage() {
             fetchPengaduan();
         }
     }, [user, activeTab, fetchPengaduan]);
+
+    useEffect(() => {
+        if (user && activeTab === 'dana-desa') {
+            fetchDanaDesa();
+        }
+    }, [user, activeTab, fetchDanaDesa]);
 
     const showAlert = (type, message) => {
         setAlert({ type, message });
@@ -636,6 +668,97 @@ export default function AdminPage() {
         }
     };
 
+    // --- Dana Desa handlers ---
+    const handleSubmitDanaDesa = async (e) => {
+        e.preventDefault();
+        if (!danaDesaForm.year.trim()) {
+            showAlert('error', 'Tahun wajib diisi!');
+            return;
+        }
+        if (!danaDesaForm.image_url) {
+            showAlert('error', 'Gambar wajib diunggah!');
+            return;
+        }
+
+        setSubmittingDanaDesa(true);
+        try {
+            const res = await fetch('/api/dana-desa', {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify(danaDesaForm),
+            });
+
+            if (res.ok) {
+                showAlert('success', 'Data Dana Desa berhasil ditambahkan!');
+                setDanaDesaForm({ year: '', image_url: '' });
+                fetchDanaDesa();
+            } else {
+                const json = await res.json();
+                showAlert('error', json.error || 'Gagal menambahkan data Dana Desa');
+            }
+        } catch (err) {
+            showAlert('error', 'Terjadi kesalahan jaringan');
+        } finally {
+            setSubmittingDanaDesa(false);
+        }
+    };
+
+    const handleDanaDesaImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 4.5 * 1024 * 1024) {
+            showAlert('error', 'Ukuran file terlalu besar (maks 4.5MB)');
+            return;
+        }
+
+        setUploadingDanaDesaImage(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                setDanaDesaForm({ ...danaDesaForm, image_url: data.secure_url });
+                showAlert('success', 'Gambar berhasil diunggah!');
+            } else {
+                console.error('Upload error details:', data.details);
+                showAlert('error', data.error || 'Gagal mengunggah gambar');
+            }
+        } catch (err) {
+            console.error('Network or unexpected error during upload:', err);
+            showAlert('error', 'Terjadi kesalahan saat mengunggah gambar');
+        } finally {
+            setUploadingDanaDesaImage(false);
+        }
+    };
+
+    const handleDeleteDanaDesa = async (id) => {
+        if (!confirm('Hapus data Dana Desa ini?')) return;
+        try {
+            const res = await fetch(`/api/dana-desa/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+                showAlert('success', 'Data Dana Desa berhasil dihapus');
+                fetchDanaDesa();
+            } else {
+                showAlert('error', 'Gagal menghapus data Dana Desa');
+            }
+        } catch (err) {
+            showAlert('error', 'Kesalahan jaringan');
+        }
+    };
+
     // Loading state
     if (authLoading) {
         return (
@@ -684,6 +807,13 @@ export default function AdminPage() {
                 >
                     <MessageSquare size={16} />
                     Pengaduan
+                </button>
+                <button
+                    className={`admin-tab ${activeTab === 'dana-desa' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('dana-desa')}
+                >
+                    <FileText size={16} />
+                    Dana Desa
                 </button>
                 {user.role === 'admin' && (
                     <>
@@ -1302,6 +1432,130 @@ export default function AdminPage() {
                                                 </a>
                                             </div>
                                         )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Dana Desa Tab */}
+            {activeTab === 'dana-desa' && (
+                <div className="admin-grid">
+                    <div className="admin-form-card">
+                        <h2 className="admin-form-title">Tambah Data Dana Desa</h2>
+                        <form onSubmit={handleSubmitDanaDesa}>
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="dana-desa-year">
+                                    <Type size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
+                                    Tahun *
+                                </label>
+                                <input
+                                    id="dana-desa-year"
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Contoh: 2024"
+                                    value={danaDesaForm.year}
+                                    onChange={(e) => setDanaDesaForm({ ...danaDesaForm, year: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <ImageIcon size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
+                                    Gambar Dana Desa *
+                                </label>
+                                <div className="image-upload-area">
+                                    {danaDesaForm.image_url ? (
+                                        <div className="image-preview-container">
+                                            <img src={danaDesaForm.image_url} alt="Preview" className="image-preview" />
+                                            <button
+                                                type="button"
+                                                className="btn-remove-image"
+                                                onClick={() => setDanaDesaForm({ ...danaDesaForm, image_url: '' })}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="image-upload-label-wrapper">
+                                            <label className="image-upload-label" htmlFor="dana-desa-image">
+                                                {uploadingDanaDesaImage ? (
+                                                    <><Loader2 size={24} className="spinning" /> Mengunggah...</>
+                                                ) : (
+                                                    <>
+                                                        <Upload size={24} />
+                                                        <span>Klik untuk upload gambar</span>
+                                                    </>
+                                                )}
+                                            </label>
+                                            <input
+                                                type="file"
+                                                id="dana-desa-image"
+                                                accept="image/*"
+                                                onChange={handleDanaDesaImageUpload}
+                                                disabled={uploadingDanaDesaImage}
+                                                style={{ display: 'none' }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                style={{ width: '100%', marginTop: '1rem' }}
+                                disabled={submittingDanaDesa || uploadingDanaDesaImage}
+                            >
+                                {submittingDanaDesa ? (
+                                    <><Loader2 size={16} className="spinning" /> Menyimpan...</>
+                                ) : (
+                                    <><Save size={16} /> Simpan Data Dana Desa</>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="admin-list-card">
+                        <h2 className="admin-form-title" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FileText size={18} />
+                            Daftar Dana Desa
+                        </h2>
+
+                        {loadingDanaDesa ? (
+                            <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                                <Loader2 size={24} className="spinning" style={{ color: 'var(--color-primary)', margin: '0 auto' }} />
+                                <p style={{ marginTop: '0.5rem', color: 'var(--color-text-muted)' }}>Memuat data dana desa...</p>
+                            </div>
+                        ) : danaDesa.length === 0 ? (
+                            <p style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--color-text-muted)' }}>
+                                Belum ada data dana desa.
+                            </p>
+                        ) : (
+                            <div className="admin-news-list">
+                                {danaDesa.map((item) => (
+                                    <div key={item.id} className="admin-news-item">
+                                        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1 }}>
+                                            <div className="admin-news-item-thumb" style={{ width: 80, height: 60, borderRadius: '8px', overflow: 'hidden', background: 'var(--color-bg-alt)', flexShrink: 0 }}>
+                                                {item.image_url ? (
+                                                    <img src={item.image_url} alt={`Dana Desa ${item.year}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <ImageIcon size={24} style={{ margin: 18, color: 'var(--color-text-muted)' }} />
+                                                )}
+                                            </div>
+                                            <div className="admin-news-item-info">
+                                                <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Tahun: {item.year}</h3>
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="btn btn-danger btn-sm"
+                                            title="Hapus"
+                                            onClick={() => handleDeleteDanaDesa(item.id)}
+                                            style={{ padding: '8px' }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 ))}
                             </div>

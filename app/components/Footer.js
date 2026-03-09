@@ -16,9 +16,11 @@ export default function Footer() {
         <footer className="footer">
             <div className="footer-grid">
                 <div>
-                    <div className="footer-brand-name">
-                        <Home size={20} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle' }} />
-                        Desa Lumban Lobu
+                    <div className="footer-brand-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: 28, height: 28 }}>
+                            <img src="/images/Toba.svg" alt="Toba Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                        <span>Desa Lumban Lobu</span>
                     </div>
                     <p className="footer-brand-desc">
                         Website resmi Pemerintah Desa Lumban Lobu. Menyajikan informasi
@@ -37,8 +39,12 @@ export default function Footer() {
                         <Newspaper size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
                         Berita
                     </Link>
+                    <Link href="/dana-desa" className="footer-link">
+                        <FileText size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
+                        Dana Desa
+                    </Link>
                     <Link href="/pengaduan" className="footer-link">
-                        <Settings size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
+                        <MessageSquare size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
                         Pengaduan
                     </Link>
                 </div>
