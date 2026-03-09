@@ -46,13 +46,8 @@ export async function POST(request) {
     }
 }
 
-// GET /api/pengaduan - Admin listing
+// GET /api/pengaduan - Public listing (was Admin, now public as requested)
 export async function GET(request) {
-    const user = verifyAuth(request);
-    if (!user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     try {
         const res = await query('SELECT * FROM pengaduan ORDER BY created_at DESC');
         return NextResponse.json(res.rows);
