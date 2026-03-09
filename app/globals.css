@@ -1274,8 +1274,9 @@ select {
   }
 
   .hero-stats {
-    flex-wrap: wrap;
-    gap: var(--space-xl);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl) var(--space-md);
   }
 
   .news-grid {
@@ -1354,6 +1355,14 @@ select {
 
   .hero-content {
     padding: var(--space-2xl) var(--space-md);
+  }
+
+  .hero-stats {
+    gap: var(--space-lg) var(--space-sm);
+  }
+
+  .hero-stat-number {
+    font-size: var(--font-size-2xl);
   }
 
   .hero-actions {
